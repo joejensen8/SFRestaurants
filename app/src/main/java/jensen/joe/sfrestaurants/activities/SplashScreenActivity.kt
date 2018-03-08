@@ -13,7 +13,7 @@ class SplashScreenActivity: AbstractActivity() {
     }
 
     private fun moveToMapActivity() {
-        val intent = Intent(this, MapActivity::class.java)
+        val intent = Intent(this, MapsActivity::class.java)
         startActivity(intent)
         finish()
     }
