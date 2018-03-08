@@ -8,7 +8,6 @@ class SplashScreenActivity: AbstractActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // do any needed logic before landing on login screen
         moveToMapActivity()
     }
 

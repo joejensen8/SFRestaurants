@@ -2,7 +2,6 @@ package jensen.joe.sfrestaurants.activities
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -29,23 +28,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
     }
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
     override fun onMapReady(googleMap: GoogleMap) {
-        Log.i("JOE", "map ready");
         mMap = googleMap
-
-        // Add a marker in Sydney and move the camera
         val sanFran = LatLng(37.7749, -122.4194)
-        mMap.addMarker(MarkerOptions().position(sanFran).title("Marker in San Fran"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sanFran))
+        mMap.addMarker(MarkerOptions().position(sanFran).title("San Fran!"))
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sanFran, 12.0f))
         mMap.uiSettings.isZoomControlsEnabled = true
         mMap.setOnMarkerClickListener(this)
     }
