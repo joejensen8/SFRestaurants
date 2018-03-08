@@ -1,7 +1,6 @@
 package jensen.joe.sfrestaurants.activities
 
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -12,9 +11,14 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import jensen.joe.sfrestaurants.R
+import jensen.joe.sfrestaurants.presenters.RestaurantMapPresenter
+import jensen.joe.sfrestaurants.presenters.RestaurantMapPresenterImpl
+import jensen.joe.sfrestaurants.views.RestaurantMapView
 
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+class MapsActivity : AbstractActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener,
+        RestaurantMapView {
 
+    private val presenter: RestaurantMapPresenter = RestaurantMapPresenterImpl(this)
     private lateinit var mMap: GoogleMap
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
@@ -30,11 +34,17 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-        val sanFran = LatLng(37.7749, -122.4194)
-        mMap.addMarker(MarkerOptions().position(sanFran).title("San Fran!"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sanFran, 12.0f))
         mMap.uiSettings.isZoomControlsEnabled = true
         mMap.setOnMarkerClickListener(this)
+        presenter.onMapReady()
+    }
+
+    override fun addMarker(position: LatLng, title: String) {
+        mMap.addMarker(MarkerOptions().position(position).title(title))
+    }
+
+    override fun moveCamera(position: LatLng, zoom: Float) {
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, zoom))
     }
 
     override fun onMarkerClick(p0: Marker?): Boolean {
