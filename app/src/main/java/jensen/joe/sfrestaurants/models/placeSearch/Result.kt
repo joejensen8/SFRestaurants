@@ -1,4 +1,8 @@
-package jensen.joe.sfrestaurants.models
+package jensen.joe.sfrestaurants.models.placeSearch
+
+import jensen.joe.sfrestaurants.models.Geometry
+import jensen.joe.sfrestaurants.models.OpeningHours
+import jensen.joe.sfrestaurants.models.Photo
 
 data class Result(val geometry: Geometry,
                   val icon: String,
@@ -6,7 +10,7 @@ data class Result(val geometry: Geometry,
                   val name: String,
                   val opening_hours: OpeningHours,
                   val photos: List<Photo>,
-                  val placeId: String,
+                  val place_id: String,
                   val rating: Double,
                   val reference: String,
                   val scope: String,

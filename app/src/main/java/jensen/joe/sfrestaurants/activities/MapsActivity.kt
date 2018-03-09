@@ -1,7 +1,10 @@
 package jensen.joe.sfrestaurants.activities
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
+import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat
 import android.view.View
 import android.widget.Button
 import com.google.android.gms.common.ConnectionResult
@@ -18,7 +21,9 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.VisibleRegion
 import jensen.joe.sfrestaurants.R
+import jensen.joe.sfrestaurants.common.Constants
 import jensen.joe.sfrestaurants.presenters.RestaurantMapPresenter
 import jensen.joe.sfrestaurants.presenters.RestaurantMapPresenterImpl
 import jensen.joe.sfrestaurants.views.RestaurantMapView
@@ -43,9 +48,23 @@ class MapsActivity : AbstractActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
         mapFragment.getMapAsync(this)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
+        //requestLocationPermission()
+
         mGeoDataClient = Places.getGeoDataClient(this, null)
         checkGooglePlayServices()
         buildGoogleApiClient()
+    }
+
+    private fun requestLocationPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            // todo show rationale for requesting permission
+            ActivityCompat.requestPermissions(this,
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                    Constants.LOCATION_PERMISSION_REQUEST_CODE)
+        } else {
+            // Permission has already been granted
+        }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -53,18 +72,6 @@ class MapsActivity : AbstractActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
         mMap.uiSettings.isZoomControlsEnabled = true
         mMap.setOnMarkerClickListener(this)
         presenter.onMapReady()
-
-        /*
-        mMap.isMyLocationEnabled = true
-
-        fusedLocationClient.lastLocation.addOnSuccessListener(this) { location ->
-            if (location != null) {
-                lastLocation = location
-                val currentLatLng = LatLng(location.latitude, location.longitude)
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 12f))
-            }
-        }
-        */
 
         mMap.setOnCameraIdleListener {
             presenter.onCameraIdle()
@@ -83,16 +90,27 @@ class MapsActivity : AbstractActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
         }
     }
 
-    override fun addMarker(position: LatLng, title: String) {
-        mMap.addMarker(MarkerOptions().position(position).title(title))
+    override fun addMarker(position: LatLng, title: String, snippet: String, placeID: String) {
+        mMap.addMarker(MarkerOptions().position(position)
+                .title(title)
+                .snippet(snippet))
     }
 
     override fun moveCamera(position: LatLng, zoom: Float) {
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, zoom))
     }
 
+    // todo some sort of caching system?
+    override fun clearMarkers() {
+        mMap.clear()
+    }
+
     override fun onMarkerClick(p0: Marker?): Boolean {
         return presenter.onMarkerClick(p0)
+    }
+
+    override fun getZoomLevel(): Float {
+        return mMap.cameraPosition.zoom
     }
 
     @Synchronized
@@ -120,19 +138,23 @@ class MapsActivity : AbstractActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
     }
 
     override fun onConnectionFailed(p0: ConnectionResult) {
-        Log.i("JOE", "connection failed")
+
     }
 
     override fun onConnected(p0: Bundle?) {
-        Log.i("JOE", "connected!")
+
     }
 
     override fun onConnectionSuspended(p0: Int) {
-        Log.i("JOE", "connection suspended")
+
     }
 
     override fun getGoogleApiKey(): String {
         return getString(R.string.google_maps_key)
+    }
+
+    override fun getVisibleMapRegion(): VisibleRegion {
+        return mMap.projection.visibleRegion
     }
 
 }
