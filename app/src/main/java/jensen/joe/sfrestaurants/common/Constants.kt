@@ -8,4 +8,7 @@ object Constants {
     val sanFranciscoLongitude = -122.4194
     val sanFranLatLng = LatLng(sanFranciscoLatitude, sanFranciscoLongitude)
 
+    // permissions
+    val LOCATION_PERMISSION_REQUEST_CODE = 1
+
 }

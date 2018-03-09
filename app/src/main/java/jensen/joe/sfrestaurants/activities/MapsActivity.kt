@@ -2,6 +2,8 @@ package jensen.joe.sfrestaurants.activities
 
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.Button
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.common.api.GoogleApiClient
@@ -25,7 +27,7 @@ import jensen.joe.sfrestaurants.views.RestaurantMapView
 class MapsActivity : AbstractActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener,
         RestaurantMapView, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
 
-    private val presenter: RestaurantMapPresenter = RestaurantMapPresenterImpl(this, getGoogleApiKey())
+    private val presenter: RestaurantMapPresenter = RestaurantMapPresenterImpl(this)
     private lateinit var mMap: GoogleMap
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
@@ -41,7 +43,7 @@ class MapsActivity : AbstractActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
         mapFragment.getMapAsync(this)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-        mGeoDataClient = Places.getGeoDataClient(this, null);
+        mGeoDataClient = Places.getGeoDataClient(this, null)
         checkGooglePlayServices()
         buildGoogleApiClient()
     }
@@ -51,6 +53,34 @@ class MapsActivity : AbstractActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
         mMap.uiSettings.isZoomControlsEnabled = true
         mMap.setOnMarkerClickListener(this)
         presenter.onMapReady()
+
+        /*
+        mMap.isMyLocationEnabled = true
+
+        fusedLocationClient.lastLocation.addOnSuccessListener(this) { location ->
+            if (location != null) {
+                lastLocation = location
+                val currentLatLng = LatLng(location.latitude, location.longitude)
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 12f))
+            }
+        }
+        */
+
+        mMap.setOnCameraIdleListener {
+            presenter.onCameraIdle()
+        }
+
+        findViewById<Button>(R.id.search_this_area_button).setOnClickListener {
+            presenter.onSearchThisAreaClicked(mMap.cameraPosition.target)
+        }
+    }
+
+    override fun showSearchInAreaButton(show: Boolean) {
+        findViewById<Button>(R.id.search_this_area_button).visibility = if (show) {
+            View.VISIBLE
+        } else {
+            View.GONE
+        }
     }
 
     override fun addMarker(position: LatLng, title: String) {
@@ -65,7 +95,6 @@ class MapsActivity : AbstractActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
         return presenter.onMarkerClick(p0)
     }
 
-    // todo in presenter
     @Synchronized
     private fun buildGoogleApiClient() {
         mGoogleApiClient = GoogleApiClient.Builder(this)
@@ -102,7 +131,7 @@ class MapsActivity : AbstractActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
         Log.i("JOE", "connection suspended")
     }
 
-    private fun getGoogleApiKey(): String {
+    override fun getGoogleApiKey(): String {
         return getString(R.string.google_maps_key)
     }
 

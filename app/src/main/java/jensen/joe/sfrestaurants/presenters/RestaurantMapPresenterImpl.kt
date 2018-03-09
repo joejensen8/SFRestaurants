@@ -1,5 +1,6 @@
 package jensen.joe.sfrestaurants.presenters
 
+import android.util.Log
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import jensen.joe.sfrestaurants.common.Constants
@@ -11,25 +12,32 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class RestaurantMapPresenterImpl(private val view: RestaurantMapView,
-                                 private val googleApiKey: String): RestaurantMapPresenter {
+class RestaurantMapPresenterImpl(private val view: RestaurantMapView): RestaurantMapPresenter {
 
     override fun onMapReady() {
         view.addMarker(Constants.sanFranLatLng, "San Fran!")
         view.moveCamera(Constants.sanFranLatLng, 12.0f)
-        getRestaurants()
+        getRestaurants(Constants.sanFranLatLng)
     }
 
     override fun onMarkerClick(marker: Marker?): Boolean {
         return false
     }
 
-    private fun getRestaurants() {
+    override fun onCameraIdle() {
+        view.showSearchInAreaButton(true)
+    }
+
+    override fun onSearchThisAreaClicked(latLng: LatLng) {
+        getRestaurants(latLng)
+        view.showSearchInAreaButton(false)
+    }
+
+    private fun getRestaurants(latLng: LatLng) {
         // just getting in san fran right now
-        val location = "37.7749,-122.4194"
         //val location: String = Constants.sanFranLatLng.toString() + "," + Constants.sanFranciscoLongitude.toString()
 
-        GooglePlacesService.create().getPlaces(location, "restaurant", "5000", googleApiKey)
+        GooglePlacesService.create().getPlaces(getLatLngParam(latLng), "restaurant", "5000", view.getGoogleApiKey())
                 .enqueue(object : Callback<Example> {
 
             override fun onResponse(call: Call<Example>, response: Response<Example>) {
@@ -43,6 +51,13 @@ class RestaurantMapPresenterImpl(private val view: RestaurantMapView,
 
         })
 
+    }
+
+    private fun getLatLngParam(latLng: LatLng): String {
+        val builder = StringBuilder()
+        builder.append(latLng.latitude).append(",").append(latLng.longitude)
+        Log.i("JOE", builder.toString())
+        return builder.toString()
     }
 
     private fun processResults(response: Example) {

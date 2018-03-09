@@ -6,6 +6,12 @@ interface RestaurantMapView {
 
     fun addMarker(position: LatLng, title: String)
 
+    // fun clearMarker
+
     fun moveCamera(position: LatLng, zoom: Float)
+
+    fun getGoogleApiKey(): String
+
+    fun showSearchInAreaButton(show: Boolean)
 
 }
