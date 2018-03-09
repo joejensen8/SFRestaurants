@@ -203,6 +203,8 @@ class MapsActivity : AbstractActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
         detailDialog?.findViewById<TextView>(R.id.place_name)?.text = title
     }
 
+    // todo somehow cache the images so they don't load every time details are opened?
+    // or preload them somehow
     override fun setDetailImage(url: String) {
         val imageView = detailDialog?.findViewById<ImageView>(R.id.place_image)
         val placeholder = getDrawable(R.drawable.ic_collections_32dp)

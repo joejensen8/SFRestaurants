@@ -2,7 +2,6 @@ package jensen.joe.sfrestaurants.utils
 
 import android.location.Location
 import com.google.android.gms.maps.model.LatLng
-import java.util.*
 
 fun getRadius(p1: LatLng, p2: LatLng): Double {
     val results = FloatArray(3)
