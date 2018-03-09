@@ -4,6 +4,7 @@
     <string name="search_in_this_area">Search in this Area</string>
     <string name="more_info">More Info</string>
     <string name="dismiss">Dismiss</string>
+    <string name="address">Address</string>
 
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyC__nUDAR9w-gJX0n3XpcVzOgwHDnK8I6Q</string>
 </resources>

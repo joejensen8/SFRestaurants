@@ -41,7 +41,7 @@ class MapPresenterImpl(private val view: RestaurantMapView): MapPresenter {
     }
 
     private fun getPriceSymbol(price: Int): String {
-        val builder = StringBuilder(4)
+        val builder = StringBuilder(5)
         for (i in 0..price) {
             builder.append('$')
         }

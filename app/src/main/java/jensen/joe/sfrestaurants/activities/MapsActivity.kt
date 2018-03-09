@@ -63,6 +63,7 @@ class MapsActivity : AbstractActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
         buildGoogleApiClient()
     }
 
+    // todo implement and put logic in presenter
     private fun requestLocationPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
