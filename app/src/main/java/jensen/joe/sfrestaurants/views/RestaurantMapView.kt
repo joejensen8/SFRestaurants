@@ -29,6 +29,12 @@ interface RestaurantMapView {
 
     fun setDetailTitle(title: String)
 
+    fun setDetailHours(hours: String)
+
+    fun setOpenNow(openNow: String)
+
+    fun setDetailAddress(address: String)
+
     fun setDetailImage(url: String)
 
 }

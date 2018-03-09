@@ -23,47 +23,93 @@
 
     </RelativeLayout>
 
-    <RelativeLayout
-        android:id="@+id/content_frame"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="visible"
-        android:layout_margin="10dp">
+        android:layout_height="match_parent">
 
         <RelativeLayout
+            android:id="@+id/content_frame"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:visibility="visible"
+            android:layout_margin="10dp">
 
-            <TextView
-                android:id="@+id/place_name"
-                android:textSize="32sp"
-                android:layout_alignParentStart="true"
+            <RelativeLayout
+                android:id="@+id/top_row_title"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/place_name"
+                    android:textSize="32sp"
+                    android:maxWidth="300dp"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <ImageView
+                    android:id="@+id/dismiss_place_details"
+                    android:layout_marginTop="0dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_close_32dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginStart="5dp"
+                    android:tint="@color/grey"
+                    android:layout_alignParentTop="true"
+                    android:contentDescription="@string/dismiss"/>
+
+            </RelativeLayout>
 
             <ImageView
-                android:id="@+id/dismiss_place_details"
-                android:layout_below="@id/place_name"
-                android:layout_marginTop="10dp"
+                android:id="@+id/place_image"
+                android:layout_below="@id/top_row_title"
+                android:layout_marginTop="15dp"
+                android:layout_width="wrap_content"
+                android:layout_height="250dp"
+                android:contentDescription="image"/>
+
+            <TextView
+                android:id="@+id/open_now"
+                android:layout_below="@id/place_image"
+                android:layout_marginBottom="10dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_close_32dp"
-                android:layout_alignParentEnd="true"
+                android:textSize="20sp"
+                android:layout_marginTop="10dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/place_hours"
+                android:layout_below="@id/open_now"
+                android:layout_marginTop="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:layout_marginStart="10dp"/>
+
+            <TextView
+                android:id="@+id/address_header"
+                android:layout_below="@id/place_hours"
+                android:layout_marginBottom="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:text="Address"/>
+
+            <TextView
                 android:layout_marginStart="5dp"
-                android:tint="@color/grey"
-                android:layout_centerVertical="true"
-                android:contentDescription="@string/dismiss"/>
+                android:id="@+id/place_address"
+                android:layout_below="@id/address_header"
+                android:layout_marginBottom="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp" />
 
         </RelativeLayout>
 
-
-        <ImageView
-            android:id="@+id/place_image"
-            android:layout_below="@id/place_name"
-            android:layout_marginTop="10dp"
-            android:layout_width="200dp"
-            android:layout_height="200dp" />
-
-    </RelativeLayout>
+    </ScrollView>
 
 </RelativeLayout>

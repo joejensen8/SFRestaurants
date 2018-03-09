@@ -1,11 +1,11 @@
 package jensen.joe.sfrestaurants.presenters
 
-import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import jensen.joe.sfrestaurants.common.Constants
+import jensen.joe.sfrestaurants.models.place.OpeningHours
 import jensen.joe.sfrestaurants.models.place.detail.Detail
 import jensen.joe.sfrestaurants.models.place.search.Example
 import jensen.joe.sfrestaurants.models.place.search.Result
@@ -130,26 +130,49 @@ class MapPresenterImpl(private val view: RestaurantMapView): MapPresenter {
     }
 
     private fun processDetailResults(response: Detail) {
-        Log.i("JOE", "detail status: " + response.status)
-        val title = response.result.name
-        val rating = response.result.rating.toString() + " stars"
-        val address = response.result.formatted_address
-        view.setDetailTitle(title)
-        view.setDetailImage(getPhotoURL(response.result.photos[0].photo_reference))
+        try {
+            val title = response.result.name
+            //val rating = response.result.rating.toString() + " stars"
+            val address = response.result.formatted_address
+            val hours = getHoursText(response.result.opening_hours)
+            val openNow = if (response.result.opening_hours.open_now) {
+                "Open Now!"
+            } else {
+                "Currently closed."
+            }
+            view.setDetailTitle(title)
+            view.setOpenNow(openNow)
+            view.setDetailAddress(address)
+            view.setDetailHours(hours)
+            val photos = response.result.photos
+            if (photos != null && photos.isNotEmpty()) {
+                val photoRef = photos[0].photo_reference // todo grab more than just first pic
+                if (photoRef.isNotEmpty()) {
+                    view.setDetailImage(getPhotoURL(photoRef))
+                }
+            }
+        } catch (e: Exception) {
+            Log.i("JOE", "EXCEPTION: ${e.message}")
+        }
     }
 
+    private fun getHoursText(openingHours: OpeningHours): String {
+        val builder = StringBuilder()
+        for (hours in openingHours.weekday_text) {
+            builder.append(hours).append("\n")
+        }
+        return builder.toString()
+    }
+
+    // todo put in service class or use retrofit?
     private fun getPhotoURL(ref: String): String {
         val base = "https://maps.googleapis.com/maps/api/place/photo"
         val url = Uri.parse(base).buildUpon()
         url.appendQueryParameter("photoreference", ref)
         url.appendQueryParameter("key", view.getGoogleApiKey())
-        url.appendQueryParameter("maxwidth", "600")
-        url.appendQueryParameter("maxheight", "600")
+        url.appendQueryParameter("maxwidth", "800")
+        url.appendQueryParameter("maxheight", "800")
         return url.toString()
-    }
-
-    private fun processPhotoResult(bitmap: Bitmap) {
-
     }
 
 }

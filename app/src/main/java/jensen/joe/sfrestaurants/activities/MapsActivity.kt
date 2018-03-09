@@ -213,6 +213,18 @@ class MapsActivity : AbstractActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
                 .into(imageView)
     }
 
+    override fun setDetailAddress(address: String) {
+        detailDialog?.findViewById<TextView>(R.id.place_address)?.text = address
+    }
+
+    override fun setDetailHours(hours: String) {
+        detailDialog?.findViewById<TextView>(R.id.place_hours)?.text = hours
+    }
+
+    override fun setOpenNow(openNow: String) {
+        detailDialog?.findViewById<TextView>(R.id.open_now)?.text = openNow
+    }
+
     // todo maybe make it a fragment or activity
     override fun showDetailView(place: String) {
         detailDialog = Dialog(this, android.R.style.ThemeOverlay_Material)
