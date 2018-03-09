@@ -1,4 +1,4 @@
-package jensen.joe.sfrestaurants.models
+package jensen.joe.sfrestaurants.models.place
 
 data class Photo(val height: Int,
                  val html_attributions: List<String>,

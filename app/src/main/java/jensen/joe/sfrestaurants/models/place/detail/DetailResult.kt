@@ -1,8 +1,8 @@
-package jensen.joe.sfrestaurants.models.placeDetail
+package jensen.joe.sfrestaurants.models.place.detail
 
-import jensen.joe.sfrestaurants.models.Geometry
-import jensen.joe.sfrestaurants.models.OpeningHours
-import jensen.joe.sfrestaurants.models.Photo
+import jensen.joe.sfrestaurants.models.place.Geometry
+import jensen.joe.sfrestaurants.models.place.OpeningHours
+import jensen.joe.sfrestaurants.models.place.Photo
 
 data class DetailResult(val address_components: List<AddressComponent>,
                         val adr_address: String,

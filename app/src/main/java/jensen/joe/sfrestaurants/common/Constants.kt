@@ -11,4 +11,7 @@ object Constants {
     // permissions
     val LOCATION_PERMISSION_REQUEST_CODE = 1
 
+    // fragments
+    val PLACE_DETAIL_FRAGMENT_TAG = "PLACE_DETAIL_FRAGMENT_TAG"
+
 }

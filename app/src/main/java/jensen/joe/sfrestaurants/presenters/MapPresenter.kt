@@ -3,7 +3,7 @@ package jensen.joe.sfrestaurants.presenters
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 
-interface RestaurantMapPresenter {
+interface MapPresenter {
 
     fun onMapReady()
 

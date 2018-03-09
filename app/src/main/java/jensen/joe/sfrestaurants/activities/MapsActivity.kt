@@ -27,15 +27,16 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.VisibleRegion
 import jensen.joe.sfrestaurants.R
 import jensen.joe.sfrestaurants.common.Constants
-import jensen.joe.sfrestaurants.presenters.RestaurantMapPresenter
-import jensen.joe.sfrestaurants.presenters.RestaurantMapPresenterImpl
+import jensen.joe.sfrestaurants.fragments.PlaceDetailFragment
+import jensen.joe.sfrestaurants.presenters.MapPresenter
+import jensen.joe.sfrestaurants.presenters.MapPresenterImpl
 import jensen.joe.sfrestaurants.views.RestaurantMapView
 
 
 class MapsActivity : AbstractActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener,
         RestaurantMapView, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
 
-    private val presenter: RestaurantMapPresenter = RestaurantMapPresenterImpl(this)
+    private val presenter: MapPresenter = MapPresenterImpl(this)
     private lateinit var mMap: GoogleMap
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
@@ -204,6 +205,17 @@ class MapsActivity : AbstractActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
         desc.findViewById<Button>(R.id.marker_more_info).setOnClickListener {
             presenter.moreInfoClicked(placeID)
         }
+    }
+
+    override fun moveToDetailView(place: String) {
+        val fragToAdd = PlaceDetailFragment()
+        val args = Bundle()
+        args.putString("placeID", place)
+        fragToAdd.arguments = args
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.add(fragToAdd, Constants.PLACE_DETAIL_FRAGMENT_TAG)
+        transaction.addToBackStack(Constants.PLACE_DETAIL_FRAGMENT_TAG)
+        transaction.commit()
     }
 
 }

@@ -1,20 +1,19 @@
 package jensen.joe.sfrestaurants.presenters
 
-import android.location.Location
 import android.util.Log
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import jensen.joe.sfrestaurants.common.Constants
-import jensen.joe.sfrestaurants.models.placeDetail.Detail
-import jensen.joe.sfrestaurants.models.placeSearch.Example
-import jensen.joe.sfrestaurants.models.placeSearch.Result
+import jensen.joe.sfrestaurants.models.place.search.Example
+import jensen.joe.sfrestaurants.models.place.search.Result
 import jensen.joe.sfrestaurants.services.GooglePlacesService
+import jensen.joe.sfrestaurants.utils.getRadius
 import jensen.joe.sfrestaurants.views.RestaurantMapView
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class RestaurantMapPresenterImpl(private val view: RestaurantMapView): RestaurantMapPresenter {
+class MapPresenterImpl(private val view: RestaurantMapView): MapPresenter {
 
     private var markers: MutableMap<LatLng, Result>? = HashMap()
     private var lastCameraLocation: LatLng? = null
@@ -51,7 +50,7 @@ class RestaurantMapPresenterImpl(private val view: RestaurantMapView): Restauran
         val lastCameraLoc = lastCameraLocation
         if (lastCameraLoc != null) {
             val radius = getRadius(lastCameraLoc, currCameraLocation)
-            if (radius > 5000.0) {
+            if (radius > 1000.0) { // todo change this value based on zoom
                 view.showSearchInAreaButton(true)
             }
         } else {
@@ -61,11 +60,13 @@ class RestaurantMapPresenterImpl(private val view: RestaurantMapView): Restauran
 
     override fun onSearchThisAreaClicked(latLng: LatLng) {
         getRestaurants(latLng)
+        lastCameraLocation = view.getCameraLocation()
         view.showSearchInAreaButton(false)
     }
 
     override fun moreInfoClicked(placeID: String) {
-        getPlaceDetail(placeID)
+        view.moveToDetailView(placeID)
+        //getPlaceDetail(placeID)
     }
 
     private fun getRestaurants(latLng: LatLng) {
@@ -73,7 +74,8 @@ class RestaurantMapPresenterImpl(private val view: RestaurantMapView): Restauran
         view.clearMarkers()
         val vr = view.getVisibleMapRegion()
         val calcRadius = getRadius(vr.farLeft, vr.farRight)
-        val radius = if (calcRadius <= 1) { 500.0 } else { calcRadius }
+        // todo need better logic for getting what radius to send to google services
+        val radius = if (calcRadius <= 1) { 500.0 } else { calcRadius / 2 }
         GooglePlacesService.create().getPlaces(getLatLngParam(latLng), "restaurant", radius.toString(), view.getGoogleApiKey())
                 .enqueue(object : Callback<Example> {
 
@@ -87,28 +89,6 @@ class RestaurantMapPresenterImpl(private val view: RestaurantMapView): Restauran
             }
 
         })
-    }
-
-    private fun getPlaceDetail(placeID: String) {
-        GooglePlacesService.create().getPlaceDetails(placeID, view.getGoogleApiKey())
-                .enqueue(object : Callback<Detail> {
-
-            override fun onResponse(call: Call<Detail>, response: Response<Detail>) {
-                val detail = response.body()
-                processDetailResults(detail as Detail)
-            }
-
-            override fun onFailure(call: Call<Detail>, t: Throwable) {
-                t.printStackTrace()
-            }
-
-        })
-    }
-
-    private fun getRadius(p1: LatLng, p2: LatLng): Double {
-        val results = FloatArray(3)
-        Location.distanceBetween(p1.latitude, p1.longitude, p2.latitude, p2.longitude, results)
-        return results[0].toDouble()
     }
 
     private fun getLatLngParam(latLng: LatLng): String {
@@ -127,15 +107,6 @@ class RestaurantMapPresenterImpl(private val view: RestaurantMapView): Restauran
             markers?.put(position, result)
             view.addMarker(position, result.name)
         }
-    }
-
-    private fun processDetailResults(response: Detail) {
-        Log.i("JOE", "detail status: " + response.status)
-        val title = response.result.name
-        val rating = response.result.rating.toString() + " stars"
-        val reviews = "(" + response.result.reviews.count().toString() + " reviews)"
-        val address = response.result.formatted_address
-        val description = "$rating - $reviews"
     }
 
 }

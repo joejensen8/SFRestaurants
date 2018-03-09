@@ -8,8 +8,12 @@ import android.view.ViewGroup
 
 class PlaceDetailFragment: Fragment() {
 
+    // could show spinner until the response comes back
+    // then inflate the information
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val placeID = arguments?.get("placeID") // todo put string key in const
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

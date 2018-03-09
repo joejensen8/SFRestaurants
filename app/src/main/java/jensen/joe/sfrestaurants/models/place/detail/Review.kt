@@ -1,4 +1,4 @@
-package jensen.joe.sfrestaurants.models.placeDetail
+package jensen.joe.sfrestaurants.models.place.detail
 
 data class Review(val author_name: String,
                   val author_url: String,

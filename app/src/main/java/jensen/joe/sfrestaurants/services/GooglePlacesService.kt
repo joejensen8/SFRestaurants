@@ -1,7 +1,7 @@
 package jensen.joe.sfrestaurants.services
 
-import jensen.joe.sfrestaurants.models.placeDetail.Detail
-import jensen.joe.sfrestaurants.models.placeSearch.Example
+import jensen.joe.sfrestaurants.models.place.detail.Detail
+import jensen.joe.sfrestaurants.models.place.search.Example
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
