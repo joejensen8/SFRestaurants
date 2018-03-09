@@ -1,6 +1,7 @@
 package jensen.joe.sfrestaurants.activities
 
 import android.Manifest
+import android.app.Dialog
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
@@ -9,6 +10,7 @@ import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
@@ -25,9 +27,9 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.VisibleRegion
+import com.squareup.picasso.Picasso
 import jensen.joe.sfrestaurants.R
 import jensen.joe.sfrestaurants.common.Constants
-import jensen.joe.sfrestaurants.fragments.PlaceDetailFragment
 import jensen.joe.sfrestaurants.presenters.MapPresenter
 import jensen.joe.sfrestaurants.presenters.MapPresenterImpl
 import jensen.joe.sfrestaurants.views.RestaurantMapView
@@ -42,6 +44,8 @@ class MapsActivity : AbstractActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
 
     private lateinit var mGoogleApiClient: GoogleApiClient
     private lateinit var mGeoDataClient: GeoDataClient
+
+    private var detailDialog: Dialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -142,15 +146,15 @@ class MapsActivity : AbstractActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
     }
 
     override fun onConnectionFailed(p0: ConnectionResult) {
-
+        //todo
     }
 
     override fun onConnected(p0: Bundle?) {
-
+        //todo
     }
 
     override fun onConnectionSuspended(p0: Int) {
-
+        //todo
     }
 
     override fun getGoogleApiKey(): String {
@@ -171,8 +175,6 @@ class MapsActivity : AbstractActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
         desc.findViewById<TextView>(R.id.marker_details).text = description
         desc.findViewById<TextView>(R.id.marker_address).text = address
 
-        // todo animate
-
         if (desc.visibility == View.GONE) {
             val animation = AnimationUtils.loadAnimation(this, R.anim.slide_bottom_up)
             animation.setAnimationListener(object : Animation.AnimationListener {
@@ -189,33 +191,54 @@ class MapsActivity : AbstractActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
         }
 
         desc.findViewById<Button>(R.id.marker_dismiss).setOnClickListener {
-            // todo animation not working
-            val anim = AnimationUtils.loadAnimation(this, R.anim.slide_top_down)
-            anim.setAnimationListener(object : Animation.AnimationListener {
-                override fun onAnimationStart(animation: Animation) {}
-
-                override fun onAnimationEnd(animation: Animation) {
-                    desc.visibility = View.GONE
-                }
-
-                override fun onAnimationRepeat(animation: Animation) {}
-            })
-            desc.startAnimation(anim)
+            dismissBottomDetail()
         }
         desc.findViewById<Button>(R.id.marker_more_info).setOnClickListener {
             presenter.moreInfoClicked(placeID)
         }
     }
 
-    override fun moveToDetailView(place: String) {
-        val fragToAdd = PlaceDetailFragment()
-        val args = Bundle()
-        args.putString("placeID", place)
-        fragToAdd.arguments = args
-        val transaction = supportFragmentManager.beginTransaction()
-        transaction.add(fragToAdd, Constants.PLACE_DETAIL_FRAGMENT_TAG)
-        transaction.addToBackStack(Constants.PLACE_DETAIL_FRAGMENT_TAG)
-        transaction.commit()
+    override fun setDetailTitle(title: String) {
+        detailDialog?.findViewById<TextView>(R.id.place_name)?.text = title
+    }
+
+    override fun setDetailImage(url: String) {
+        val imageView = detailDialog?.findViewById<ImageView>(R.id.place_image)
+        val placeholder = getDrawable(R.drawable.ic_collections_32dp)
+        placeholder.setTint(resources.getColor(R.color.grey))
+        Picasso.with(this)
+                .load(url)
+                .placeholder(placeholder)
+                .error(placeholder)
+                .into(imageView)
+    }
+
+    // todo maybe make it a fragment or activity
+    override fun showDetailView(place: String) {
+        detailDialog = Dialog(this, android.R.style.ThemeOverlay_Material)
+        detailDialog?.setContentView(R.layout.dialog_place_details)
+        detailDialog?.window?.setWindowAnimations(R.style.PlaceDialogAnimation)
+        detailDialog?.show()
+        detailDialog?.findViewById<ImageView>(R.id.dismiss_place_details)?.setOnClickListener {
+            detailDialog?.dismiss()
+        }
+    }
+
+    override fun dismissBottomDetail() {
+        val view = findViewById<View>(R.id.place_information)
+        if (view != null && view.visibility == View.VISIBLE) {
+            val anim = AnimationUtils.loadAnimation(this, R.anim.slide_top_down)
+            anim.setAnimationListener(object : Animation.AnimationListener {
+                override fun onAnimationStart(animation: Animation) {}
+
+                override fun onAnimationEnd(animation: Animation) {
+                    view.visibility = View.GONE
+                }
+
+                override fun onAnimationRepeat(animation: Animation) {}
+            })
+            view.startAnimation(anim)
+        }
     }
 
 }

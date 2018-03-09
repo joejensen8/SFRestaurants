@@ -1,5 +1,6 @@
 package jensen.joe.sfrestaurants.services
 
+import android.graphics.Bitmap
 import jensen.joe.sfrestaurants.models.place.detail.Detail
 import jensen.joe.sfrestaurants.models.place.search.Example
 import retrofit2.Call
@@ -17,12 +18,17 @@ interface GooglePlacesService {
                   @Query("key") key: String):
             Call<Example>
 
-    //https://maps.googleapis.com/maps/api/place/details/json?placeid=ChIJN1t_tDeuEmsRUsoyG83frY4&key=YOUR_API_KEY
-
     @GET("maps/api/place/details/json")
     fun getPlaceDetails(@Query("placeid") placeid: String,
-                  @Query("key") key: String):
+                        @Query("key") key: String):
             Call<Detail>
+
+    @GET("maps/api/place/photo")
+    fun getPlacePhoto(@Query("photoreference") photoreference: String,
+                      @Query("key") key: String,
+                      @Query("maxheight") maxheight: String,
+                      @Query("maxwidth") maxwidth: String):
+            Call<Bitmap>
 
     companion object {
         fun create(): GooglePlacesService {

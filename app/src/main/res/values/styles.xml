@@ -13,4 +13,10 @@
         <item name="android:windowBackground">@drawable/splash_background</item>
     </style>
 
+    <!--Dialog place detail animation-->
+    <style name="PlaceDialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/slide_bottom_up</item>
+        <item name="android:windowExitAnimation">@anim/slide_top_down</item>
+    </style>
+
 </resources>

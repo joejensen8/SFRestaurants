@@ -1,9 +1,12 @@
 package jensen.joe.sfrestaurants.presenters
 
+import android.graphics.Bitmap
+import android.net.Uri
 import android.util.Log
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import jensen.joe.sfrestaurants.common.Constants
+import jensen.joe.sfrestaurants.models.place.detail.Detail
 import jensen.joe.sfrestaurants.models.place.search.Example
 import jensen.joe.sfrestaurants.models.place.search.Result
 import jensen.joe.sfrestaurants.services.GooglePlacesService
@@ -52,6 +55,8 @@ class MapPresenterImpl(private val view: RestaurantMapView): MapPresenter {
             val radius = getRadius(lastCameraLoc, currCameraLocation)
             if (radius > 1000.0) { // todo change this value based on zoom
                 view.showSearchInAreaButton(true)
+            } else {
+                view.showSearchInAreaButton(false)
             }
         } else {
             lastCameraLocation = view.getCameraLocation()
@@ -65,8 +70,9 @@ class MapPresenterImpl(private val view: RestaurantMapView): MapPresenter {
     }
 
     override fun moreInfoClicked(placeID: String) {
-        view.moveToDetailView(placeID)
-        //getPlaceDetail(placeID)
+        view.showDetailView(placeID)
+        //view.dismissBottomDetail()
+        getPlaceDetail(placeID)
     }
 
     private fun getRestaurants(latLng: LatLng) {
@@ -94,7 +100,6 @@ class MapPresenterImpl(private val view: RestaurantMapView): MapPresenter {
     private fun getLatLngParam(latLng: LatLng): String {
         val builder = StringBuilder()
         builder.append(latLng.latitude).append(",").append(latLng.longitude)
-        Log.i("JOE", builder.toString())
         return builder.toString()
     }
 
@@ -103,10 +108,48 @@ class MapPresenterImpl(private val view: RestaurantMapView): MapPresenter {
         for (result: Result in response.results) {
             val position = LatLng(result.geometry.location.lat,
                     result.geometry.location.lng)
-            Log.i("JOE", "position: $position and id is " + result.place_id)
             markers?.put(position, result)
             view.addMarker(position, result.name)
         }
+    }
+
+    private fun getPlaceDetail(placeID: String) {
+        GooglePlacesService.create().getPlaceDetails(placeID, view.getGoogleApiKey())
+                .enqueue(object : Callback<Detail> {
+
+            override fun onResponse(call: Call<Detail>, response: Response<Detail>) {
+                val detail = response.body()
+                processDetailResults(detail as Detail)
+            }
+
+            override fun onFailure(call: Call<Detail>, t: Throwable) {
+                t.printStackTrace()
+            }
+
+        })
+    }
+
+    private fun processDetailResults(response: Detail) {
+        Log.i("JOE", "detail status: " + response.status)
+        val title = response.result.name
+        val rating = response.result.rating.toString() + " stars"
+        val address = response.result.formatted_address
+        view.setDetailTitle(title)
+        view.setDetailImage(getPhotoURL(response.result.photos[0].photo_reference))
+    }
+
+    private fun getPhotoURL(ref: String): String {
+        val base = "https://maps.googleapis.com/maps/api/place/photo"
+        val url = Uri.parse(base).buildUpon()
+        url.appendQueryParameter("photoreference", ref)
+        url.appendQueryParameter("key", view.getGoogleApiKey())
+        url.appendQueryParameter("maxwidth", "600")
+        url.appendQueryParameter("maxheight", "600")
+        return url.toString()
+    }
+
+    private fun processPhotoResult(bitmap: Bitmap) {
+
     }
 
 }

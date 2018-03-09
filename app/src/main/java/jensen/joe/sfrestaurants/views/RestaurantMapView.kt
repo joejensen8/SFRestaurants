@@ -23,6 +23,12 @@ interface RestaurantMapView {
 
     fun showMarkerDetail(title: String, description: String, address: String, placeID: String)
 
-    fun moveToDetailView(place: String)
+    fun showDetailView(place: String)
+
+    fun dismissBottomDetail()
+
+    fun setDetailTitle(title: String)
+
+    fun setDetailImage(url: String)
 
 }
