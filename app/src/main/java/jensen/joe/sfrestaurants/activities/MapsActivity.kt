@@ -1,8 +1,14 @@
 package jensen.joe.sfrestaurants.activities
 
 import android.os.Bundle
+import android.util.Log
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
+import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.places.GeoDataClient
+import com.google.android.gms.location.places.Places
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -15,12 +21,16 @@ import jensen.joe.sfrestaurants.presenters.RestaurantMapPresenter
 import jensen.joe.sfrestaurants.presenters.RestaurantMapPresenterImpl
 import jensen.joe.sfrestaurants.views.RestaurantMapView
 
-class MapsActivity : AbstractActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener,
-        RestaurantMapView {
 
-    private val presenter: RestaurantMapPresenter = RestaurantMapPresenterImpl(this)
+class MapsActivity : AbstractActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener,
+        RestaurantMapView, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
+
+    private val presenter: RestaurantMapPresenter = RestaurantMapPresenterImpl(this, getGoogleApiKey())
     private lateinit var mMap: GoogleMap
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+
+    private lateinit var mGoogleApiClient: GoogleApiClient
+    private lateinit var mGeoDataClient: GeoDataClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,6 +40,10 @@ class MapsActivity : AbstractActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
                 .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        mGeoDataClient = Places.getGeoDataClient(this, null);
+        checkGooglePlayServices()
+        buildGoogleApiClient()
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -48,7 +62,48 @@ class MapsActivity : AbstractActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
     }
 
     override fun onMarkerClick(p0: Marker?): Boolean {
-        return false
+        return presenter.onMarkerClick(p0)
+    }
+
+    // todo in presenter
+    @Synchronized
+    private fun buildGoogleApiClient() {
+        mGoogleApiClient = GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build()
+        mGoogleApiClient.connect()
+    }
+
+    // todo in presenter
+    private fun checkGooglePlayServices(): Boolean {
+        val googleAPI = GoogleApiAvailability.getInstance()
+        val result = googleAPI.isGooglePlayServicesAvailable(this)
+        if (result != ConnectionResult.SUCCESS) {
+            if (googleAPI.isUserResolvableError(result)) {
+                googleAPI.getErrorDialog(this, result,
+                        0).show()
+            }
+            return false
+        }
+        return true
+    }
+
+    override fun onConnectionFailed(p0: ConnectionResult) {
+        Log.i("JOE", "connection failed")
+    }
+
+    override fun onConnected(p0: Bundle?) {
+        Log.i("JOE", "connected!")
+    }
+
+    override fun onConnectionSuspended(p0: Int) {
+        Log.i("JOE", "connection suspended")
+    }
+
+    private fun getGoogleApiKey(): String {
+        return getString(R.string.google_maps_key)
     }
 
 }
