@@ -13,4 +13,6 @@ interface RestaurantMapPresenter {
 
     fun onSearchThisAreaClicked(latLng: LatLng)
 
+    fun moreInfoClicked(placeID: String)
+
 }

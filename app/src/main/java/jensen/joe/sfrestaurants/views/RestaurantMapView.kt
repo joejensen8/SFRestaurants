@@ -5,7 +5,7 @@ import com.google.android.gms.maps.model.VisibleRegion
 
 interface RestaurantMapView {
 
-    fun addMarker(position: LatLng, title: String, snippet: String, placeID: String)
+    fun addMarker(position: LatLng, title: String)
 
     fun clearMarkers()
 
@@ -18,5 +18,9 @@ interface RestaurantMapView {
     fun getZoomLevel(): Float
 
     fun getVisibleMapRegion(): VisibleRegion
+
+    fun getCameraLocation(): LatLng
+
+    fun showMarkerDetail(title: String, description: String, address: String, placeID: String)
 
 }

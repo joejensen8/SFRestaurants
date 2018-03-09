@@ -6,7 +6,10 @@ import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.view.View
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.Button
+import android.widget.TextView
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.common.api.GoogleApiClient
@@ -90,10 +93,9 @@ class MapsActivity : AbstractActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
         }
     }
 
-    override fun addMarker(position: LatLng, title: String, snippet: String, placeID: String) {
+    override fun addMarker(position: LatLng, title: String) {
         mMap.addMarker(MarkerOptions().position(position)
-                .title(title)
-                .snippet(snippet))
+                .title(title))
     }
 
     override fun moveCamera(position: LatLng, zoom: Float) {
@@ -113,6 +115,7 @@ class MapsActivity : AbstractActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
         return mMap.cameraPosition.zoom
     }
 
+    // todo in presenter
     @Synchronized
     private fun buildGoogleApiClient() {
         mGoogleApiClient = GoogleApiClient.Builder(this)
@@ -155,6 +158,52 @@ class MapsActivity : AbstractActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
 
     override fun getVisibleMapRegion(): VisibleRegion {
         return mMap.projection.visibleRegion
+    }
+
+    override fun getCameraLocation(): LatLng {
+        return mMap.cameraPosition.target
+    }
+
+    override fun showMarkerDetail(title: String, description: String, address: String, placeID: String) {
+        val desc = findViewById<View>(R.id.place_information)
+        desc.findViewById<TextView>(R.id.marker_title).text = title
+        desc.findViewById<TextView>(R.id.marker_details).text = description
+        desc.findViewById<TextView>(R.id.marker_address).text = address
+
+        // todo animate
+
+        if (desc.visibility == View.GONE) {
+            val animation = AnimationUtils.loadAnimation(this, R.anim.slide_bottom_up)
+            animation.setAnimationListener(object : Animation.AnimationListener {
+                override fun onAnimationStart(animation: Animation) {}
+
+                override fun onAnimationEnd(animation: Animation) {
+                    desc.visibility = View.VISIBLE
+                    desc.bringToFront()
+                }
+
+                override fun onAnimationRepeat(animation: Animation) {}
+            })
+            desc.startAnimation(animation)
+        }
+
+        desc.findViewById<Button>(R.id.marker_dismiss).setOnClickListener {
+            // todo animation not working
+            val anim = AnimationUtils.loadAnimation(this, R.anim.slide_top_down)
+            anim.setAnimationListener(object : Animation.AnimationListener {
+                override fun onAnimationStart(animation: Animation) {}
+
+                override fun onAnimationEnd(animation: Animation) {
+                    desc.visibility = View.GONE
+                }
+
+                override fun onAnimationRepeat(animation: Animation) {}
+            })
+            desc.startAnimation(anim)
+        }
+        desc.findViewById<Button>(R.id.marker_more_info).setOnClickListener {
+            presenter.moreInfoClicked(placeID)
+        }
     }
 
 }
